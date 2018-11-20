@@ -26,17 +26,16 @@ class query(object):
 
     # select indicators 
     com_selection = []
-    year_selection = []
+    year_selection = 'range:range or year1,year2'
+
+
 
     # define the source mapping 
     DATA_PATH = pkg_resources.resource_filename('usda_com', 'data/raw/')
-    
-    print(DATA_PATH)
+    commodity_options = pd.read_excel(DATA_PATH+'commodities.xlsx')
+    commodity_options.columns = [col.strip() for col in commodity_options.columns]
 
-    #commodity_options = pd.read_excel('../data/raw/commodities.xlsx')
-
-
-    def find_commodity_code(self, search:str): 
+    def find_commodity_code(self, search_text:str): 
         '''
         find codes and commodities of interest. 
         
@@ -53,25 +52,66 @@ class query(object):
         '''
         Run the query, return the dataframe from the USDA. 
 
+        >>> query.year_selection = '1980:2000' 
+        >>> query.com_selection = ['574000']
         >>> query.run()
+
         '''
 
-        base_url = 'https://apps.fas.usda.gov/PSDOnlineDataServices/api/CommodityData/GetCommodityDataByYear'
+        def to_str(i:int)->str:
+            ''' turn an integer into a string '''
+            return str(i)
+
+        # generate the year list 
+        def clean_years(years:str)-> list:
+
+            if ':' in years: 
+                start_year = int(years[:4]) 
+                end_year = int(years[5:])
+                years_range = list(map(to_str, range(start_year, end_year+1)))
+            else: 
+                years_range = years.split(',')
+            
+            return years_range
+
+        years_range = clean_years(self.year_selection) 
+        print(years_range)
+
+
+        if self.world ==True: 
+            world_string = 'World'
+        else: 
+            world_string = ''
+
 
         results = []
 
-        for y_index, y_selection in enumerate(self.year_selection): 
+        for y_index, y_selection in enumerate(years_range):
 
             for c_index, c_selection in enumerate(self.com_selection): 
                 
-                # generate the new function 
-                new_string = '?commodityCode = {} & marketYear = {}'.format(c_selection, y_selection)
-                response = requests.get(base_url+new_string, auth=(self.api_key))
+                # add leading zeros to 
+                c_code = '0'*(7-len(c_selection))+c_selection
+
+                headers = {
+                    'Accept': 'application/json',
+                    'API_KEY': self.api_key,
+                }
+
+                params = (
+                    ('commodityCode', c_code),
+                    ('marketYear', y_selection),
+                )
+
+
+                link = 'https://apps.fas.usda.gov/PSDOnlineDataServices/api/CommodityData/Get{}CommodityDataByYear'.format(world_string)
+
+                response = requests.get(link, headers=headers, params=params)
 
                 # generate the pandas dataframe
-                json = response.json()['data']
-                
-                results.append(json)
+                json_r = response.json()
+
+                results += json_r
                 
 
         return_data = pd.DataFrame.from_records(results)
@@ -81,5 +121,7 @@ class query(object):
 
 
 
+if __name__ =='__init__': 
+    usda_com = query()
     
         

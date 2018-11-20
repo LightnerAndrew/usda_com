@@ -75,7 +75,6 @@ class query(object):
             return years_range
 
         years_range = clean_years(self.year_selection) 
-        print(years_range)
 
 
         if self.world ==True: 

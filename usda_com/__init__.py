@@ -29,7 +29,7 @@ class query(object):
     year_selection = []
 
     # define the source mapping 
-    DATA_PATH = pkg_resources.resource_filename('usda', 'data/raw/')
+    DATA_PATH = pkg_resources.resource_filename('usda_com', 'data/raw/')
     
     print(DATA_PATH)
 

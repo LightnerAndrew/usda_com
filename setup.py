@@ -7,6 +7,6 @@ setup(
     description='This package wraps the USDA Commodity API for ease of use in python. ',
     author='Andrew Lightner',
     license='MIT',
-    package_data={'usda_com': ['./usda_com/commodities.csv']},
+    package_data={'usda_com': ['./usda_com/data/commodities.csv']},
     include_package_data=True
 )

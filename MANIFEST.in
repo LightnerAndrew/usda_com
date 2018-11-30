@@ -1,1 +1,1 @@
-include usda_com/commodities.csv
+include usda_com/data/commodities.csv

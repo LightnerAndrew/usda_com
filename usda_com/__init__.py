@@ -32,7 +32,7 @@ class query(object):
 
     # define the source mapping 
     DATA_PATH = pkg_resources.resource_filename('usda_com', 'data/')
-    commodity_options = pd.read_excel(DATA_PATH+'commodities.csv')
+    commodity_options = pd.read_csv(DATA_PATH+'commodities.csv')
     commodity_options.columns = [col.strip() for col in commodity_options.columns]
 
     def find_commodity_code(self, search_text:str): 

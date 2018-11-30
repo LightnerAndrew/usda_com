@@ -31,7 +31,7 @@ class query(object):
 
 
     # define the source mapping 
-    DATA_PATH = pkg_resources.resource_filename('usda_com', 'data/raw/')
+    DATA_PATH = pkg_resources.resource_filename('usda_com')
     commodity_options = pd.read_excel(DATA_PATH+'commodities.xlsx')
     commodity_options.columns = [col.strip() for col in commodity_options.columns]
 

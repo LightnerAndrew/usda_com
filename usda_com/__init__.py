@@ -18,8 +18,6 @@ class query(object):
     :type world: bool 
     
     '''
-
-
     # parameters 
     api_key = 'code'
     world = False 
@@ -82,7 +80,7 @@ class query(object):
         else: 
             world_string = ''
 
-
+        fails = []
         results = []
 
         for y_index, y_selection in enumerate(years_range):
@@ -102,20 +100,26 @@ class query(object):
                     ('marketYear', y_selection),
                 )
 
+                try: 
+                    link = 'https://apps.fas.usda.gov/PSDOnlineDataServices/api/CommodityData/Get{}CommodityDataByYear'.format(world_string)
 
-                link = 'https://apps.fas.usda.gov/PSDOnlineDataServices/api/CommodityData/Get{}CommodityDataByYear'.format(world_string)
+                    response = requests.get(link, headers=headers, params=params)
 
-                response = requests.get(link, headers=headers, params=params)
+                    # generate the pandas dataframe
+                    json_r = response.json()
 
-                # generate the pandas dataframe
-                json_r = response.json()
+                    results += json_r
 
-                results += json_r
+                except: 
+                    fails.append((c_code, y_selection))
+
+
                 
 
         return_data = pd.DataFrame.from_records(results)
+        fail_df = pd.DataFrame(fails)
 
-        return return_data
+        return return_data, fail_df
 
 
 
